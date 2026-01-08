@@ -32,13 +32,13 @@ Response         ↓
 
 ## Features
 
-- 🤖 **Multi-Agent System**: Specialized agents for different tasks
-- 🔀 **Intelligent Routing**: Supervisor agent decides workflow path
-- 📊 **Data Analysis**:  Pandas-powered statistical analysis
-- 📝 **Report Generation**: Professional formatted output
-- 🔄 **State Management**: LangGraph state machine for reliable execution
-- 💬 **Interactive CLI**: Simple chat interface
-- ⚡ **Azure OpenAI**:  Enterprise-grade AI capabilities
+- **Multi-Agent System**: Specialized agents for different tasks
+- **Intelligent Routing**: Supervisor agent decides workflow path
+- **Data Analysis**:  Pandas-powered statistical analysis
+- **Report Generation**: Professional formatted output
+- **State Management**: LangGraph state machine for reliable execution
+- **Interactive CLI**: Simple chat interface
+- **Azure OpenAI**:  Enterprise-grade AI capabilities
 
 ## Prerequisites
 
