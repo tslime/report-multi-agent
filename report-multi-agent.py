@@ -3,7 +3,7 @@ import sys
 
 
 from dotenv import load_dotenv
-
+from functools import partial
 from models.AgentState import AgentState
 from langgraph.graph import StateGraph, END
 from utilities.DataManager import extract_data
@@ -29,24 +29,22 @@ df = extract_data("data/btcusd_1-min_data.csv")
 #Graph
 workflow = StateGraph(AgentState)
 
-workflow.add_node("supervisor",supervisor_agent_node)
-workflow.add_node("direct_response",direct_response_node)
-workflow.add_node("data_agent",data_agent_node)
-workflow.add_node("report_writer",report_writer_agent_node)
+workflow.add_node("supervisor",partial(supervisor_agent_node,language_model=llm))
+workflow.add_node("direct_response",partial(direct_response_node,language_model=llm))
+workflow.add_node("data_agent",partial(data_agent_node,language_model=llm))
+workflow.add_node("report_writer",partial(report_writer_agent_node,language_model=llm,report_format="md"))
 
 
+#Agents reasoning workflow
 workflow.set_entry_point("supervisor")
-
-
-workflow.set_conditional_edges(
+workflow.add_conditional_edges(
 "supervisor",
 route_decision,
-{
-    "data_agent":"data_agent",
-    "direct_response":"direct_response"
-}
+    {
+        "data_agent":"data_agent",
+        "direct_response":"direct_response"
+    }
 )
-
 workflow.add_edge("data_agent","report_writer")
 workflow.add_edge("report_writer",END)
 workflow.add_edge("direct_response",END)
@@ -55,6 +53,15 @@ workflow.add_edge("direct_response",END)
 app = workflow.compile()
 
 
+if __name__ == "__main__":
+    initial_state = AgentState(
+        question = "What is the trend of Bitcoin prices in the dataset?",
+        decision = "",
+        analysis = "",
+        report = "",
+        dataframe = df
+    )
+    app.invoke(initial_state)
 
 
 

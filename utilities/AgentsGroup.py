@@ -1,7 +1,9 @@
-from utilities.AgentState import AgentState
+import pandas as pd
+
+from models.AgentState import AgentState
 from langchain_openai import AzureChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent 
-
+from fpdf import FPDF
 
 def load_llm(api_k,end_point,model,temp,api_v):
     
@@ -64,15 +66,19 @@ def data_agent_node(state:AgentState,language_model):
     answers = report_agent.invoke(state["question"],handle_parsing_errors=True)
     return {"analysis":answers["output"]}
 
-def report_writer_agent_node(state:AgentState,language_model):
+def report_writer_agent_node(state:AgentState,language_model,report_format):
     
     engineered_prompt = f"""
     You are an expert report writer.
 
     original question: {state["question"]}
     analysis result: {state["analysis"]}
+    report_format : {report_format}
 
-    Write a clear, well redacted, and formatted report on the basis of this analysis.
+    Write a clear, well-redacted report in the specified format ("{report_format}").
+    - For "md" (Markdown), use Markdown conventions: headings (#, ##), bullet lists, tables, and formatting.
+    - For "pdf", structure your report with clear sections, headings, bullet points, and numbered lists so it can be formatted professionally as a PDF.
+    Base the report on the provided analysis.
     """
 
     writer_agent = create_pandas_dataframe_agent(
@@ -85,8 +91,27 @@ def report_writer_agent_node(state:AgentState,language_model):
     )
 
     writer_result = writer_agent.invoke(engineered_prompt,handle_parsing_errors=True)
+
+    if report_format == "md":
+        with open("generated-reports/statistical-report.md","w",encoding="utf-8") as f:
+            f.write(writer_result["output"])
+
+    elif report_format == "pdf":
+        write_to_pdf(writer_result["output"])
+        
     return {"report":writer_result["output"]}
 
 
 def route_decision(state: AgentState):
     return state["decision"]
+
+
+def write_to_pdf(analysis):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Times",size=12)
+
+    for line in analysis.split("\n"):
+        pdf.cell(0,10,line,ln=True)
+
+    pdf.output("generated-reports/statistical-report.pdf")
