@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from models.AgentState import AgentState
 from langgraph.graph import StateGraph, END
 from utilities.DataManager import extract_data
-from utilities.AgentsGroup import supervisor_agent_node, data_agent_node, report_writer_agent_node, direct_response_node, route_decision
+from utilities.AgentsGroup import load_llm, supervisor_agent_node, data_agent_node, report_writer_agent_node, direct_response_node, route_decision
 
 
 load_dotenv()
@@ -16,32 +16,13 @@ load_dotenv()
 #Model configs
 credentials = os.getenv("API_KEY")
 model_id = "gpt-4o-mini"
+end_p = "https://gj491-mk2w3yrm-eastus2.cognitiveservices.azure.com/"
 temperature = 0
+api_v = "2025-01-01-preview"
 
 
-#Load llm with langchain tools
-llm = AzureChatOpenAI(
-    api_key=credentials,
-    azure_endpoint="https://gj491-mk2w3yrm-eastus2.cognitiveservices.azure.com/",
-    deployment_name=model_id,
-    temperature=temperature,
-    streaming=False,
-    api_version="2025-01-01-preview"
-    )
-
-
+llm = load_llm(credentials,end_p,model_id,temperature,api_v)
 df = extract_data("data/btcusd_1-min_data.csv")
-
-
-"""
-#Start agent
-while True:
-    print("Prompt>> ",end="")
-    q = input()
-    
-    print("Answer: ",answers["output"])
-    print("\n")
-"""
 
 
 
@@ -72,3 +53,28 @@ workflow.add_edge("direct_response",END)
 
 
 app = workflow.compile()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+#Start agent
+while True:
+    print("Prompt>> ",end="")
+    q = input()
+    
+    print("Answer: ",answers["output"])
+    print("\n")
+"""

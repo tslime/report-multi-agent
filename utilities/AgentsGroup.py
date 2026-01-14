@@ -3,6 +3,20 @@ from langchain_openai import AzureChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent 
 
 
+def load_llm(api_k,end_point,model,temp,api_v):
+    
+    #Load llm with langchain tools
+    loaded_llm = AzureChatOpenAI(
+    api_key=api_k,
+    azure_endpoint=end_point,
+    deployment_name=model,
+    temperature=temp,
+    streaming=False,
+    api_version=api_v
+    )
+
+    return loaded_llm
+
 
 
 def supervisor_agent_node(state:AgentState,language_model):
@@ -19,7 +33,7 @@ def supervisor_agent_node(state:AgentState,language_model):
     """
 
     supervisor_agent = create_pandas_dataframe_agent(
-    llm,
+    language_model,
     pd.DataFrame(),
     verbose=True,
     return_intermediate_steps=True,
@@ -32,14 +46,14 @@ def supervisor_agent_node(state:AgentState,language_model):
 
 
 def direct_response_node(state:AgentState,language_model):
-    response = llm.invoke(state["question"])
+    response = language_model.invoke(state["question"])
     return {"report":response.content}
 
 
 
 def data_agent_node(state:AgentState,language_model):
     report_agent = create_pandas_dataframe_agent(
-    llm,
+    language_model,
     state["dataframe"],
     verbose=True,
     return_intermediate_steps=True,
@@ -62,7 +76,7 @@ def report_writer_agent_node(state:AgentState,language_model):
     """
 
     writer_agent = create_pandas_dataframe_agent(
-    llm,
+    language_model,
     pd.DataFrame(),
     verbose=True,
     return_intermediate_steps=True,
