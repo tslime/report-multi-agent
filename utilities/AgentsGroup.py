@@ -54,6 +54,19 @@ def direct_response_node(state:AgentState,language_model):
 
 
 def data_agent_node(state:AgentState,language_model):
+    engineered_prompt = f"""
+    You are a Python data analysis expert.
+
+    Given the user's question: "{state['question']}"
+
+    If the user's request involves visualizing data (for example, showing a trend, distribution, or other chart), generate executable Python code 
+    to create the appropriate chart from the pandas DataFrame 'df'. Save the plot as 'generated-reports/btc_trend.png'.
+
+    If no chart is needed, simply analyze the data and return findings as text.
+
+    Return ONLY the Python code for the chart if required, otherwise return only a textual analysis.
+    """
+    
     report_agent = create_pandas_dataframe_agent(
     language_model,
     state["dataframe"],
@@ -63,7 +76,7 @@ def data_agent_node(state:AgentState,language_model):
     agent_type="openai-tools"
     )
 
-    answers = report_agent.invoke(state["question"],handle_parsing_errors=True)
+    answers = report_agent.invoke(engineered_prompt,handle_parsing_errors=True)
     return {"analysis":answers["output"]}
 
 def report_writer_agent_node(state:AgentState,language_model,report_format):
@@ -75,10 +88,12 @@ def report_writer_agent_node(state:AgentState,language_model,report_format):
     analysis result: {state["analysis"]}
     report_format : {report_format}
 
-    Write a clear, well-redacted report in the specified format ("{report_format}").
-    - For "md" (Markdown), use Markdown conventions: headings (#, ##), bullet lists, tables, and formatting.
-    - For "pdf", structure your report with clear sections, headings, bullet points, and numbered lists so it can be formatted professionally as a PDF.
-    Base the report on the provided analysis.
+    If a chart image (e.g., 'btc_trend.png') has been generated, embed it in the report using the appropriate syntax:
+    - For Markdown, use ![Bitcoin Trend](btc_trend.png) in a 'Visualization' section.
+    
+    If no chart exists, omit the visualization section.
+
+    Base your report on the provided analysis.
     """
 
     writer_agent = create_pandas_dataframe_agent(
