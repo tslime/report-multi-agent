@@ -54,17 +54,18 @@ app = workflow.compile()
 
 
 if __name__ == "__main__":
-    initial_state = AgentState(
-        question = "Analyze the correlation between Bitcoin price and trading volume over time. Provide a visualization and statistical summary.",
-        decision = "",
-        analysis = "",
-        report = "",
-        dataframe = df
-    )
-    app.invoke(initial_state)
-
-
-
+    while True:
+        print("prompt>> ",end="")
+        q = input()
+        initial_state = AgentState(
+            question = q,
+            decision = "",
+            analysis = "",
+            report = "",
+            dataframe = df
+        )
+        app.invoke(initial_state)
+        print()
 
 
 
