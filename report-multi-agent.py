@@ -55,7 +55,7 @@ app = workflow.compile()
 
 if __name__ == "__main__":
     initial_state = AgentState(
-        question = "What is the trend of Bitcoin prices in the dataset?",
+        question = "Analyze the correlation between Bitcoin price and trading volume over time. Provide a visualization and statistical summary.",
         decision = "",
         analysis = "",
         report = "",

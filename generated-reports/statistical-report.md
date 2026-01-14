@@ -1,15 +1,27 @@
-# Bitcoin Price Trend Report
+# Bitcoin Price and Trading Volume Analysis Report
 
 ## Introduction
-This report analyzes the trend of Bitcoin prices based on the provided dataset. The analysis focuses on the closing prices of Bitcoin over time, allowing us to observe any significant trends or patterns.
+This report analyzes the correlation between Bitcoin price and trading volume over time. Understanding this relationship can provide insights into market behavior and investor sentiment.
 
-## Analysis
-The analysis was conducted using Python's Pandas and Matplotlib libraries. The dataset was processed to convert the timestamps into a datetime format, which facilitates accurate plotting of the price trend over time.
+## Data Preparation
+The analysis begins with the conversion of the timestamp data into a datetime format, which allows for better handling of time series data. The timestamp is then set as the index of the DataFrame for easier plotting and analysis.
 
 ## Visualization
-The following chart illustrates the trend of Bitcoin closing prices:
+A scatter plot is created to visualize the relationship between Bitcoin's trading volume and its closing price. The plot illustrates how changes in trading volume correspond to fluctuations in Bitcoin's price.
 
 ![Bitcoin Trend](btc_trend.png)
 
+## Statistical Summary
+The correlation between Bitcoin price and trading volume can be quantitatively assessed using statistical measures. The correlation coefficient will provide insights into the strength and direction of the relationship.
+
+### Correlation Coefficient
+To calculate the correlation coefficient, we can use the following code snippet:
+
+```python
+correlation = df['Close'].corr(df['Volume'])
+```
+
+This value will indicate whether there is a positive, negative, or no correlation between the two variables.
+
 ## Conclusion
-The chart provides a visual representation of Bitcoin's price movements, highlighting any upward or downward trends over the specified period. Further analysis can be conducted to explore the factors influencing these price changes.
+The analysis provides a visual representation and a statistical summary of the relationship between Bitcoin price and trading volume. Further investigation can be conducted to explore the implications of these findings on trading strategies and market predictions.
