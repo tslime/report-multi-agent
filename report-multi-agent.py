@@ -3,12 +3,10 @@ import sys
 
 
 from dotenv import load_dotenv
-from functools import partial
-from models.AgentState import AgentState
-from langgraph.graph import StateGraph, END
 from utilities.DataManager import extract_data
-from utilities.AgentsGroup import load_llm, supervisor_agent_node, data_agent_node, report_writer_agent_node, direct_response_node, route_decision
-
+from utilities.AgentsGroup import load_llm
+from models.AgentsGraph import AgentsGraph
+from models.AgentState import AgentState
 
 load_dotenv()
 
@@ -23,66 +21,19 @@ api_v = "2025-01-01-preview"
 
 llm = load_llm(credentials,end_p,model_id,temperature,api_v)
 df = extract_data("data/btcusd_1-min_data.csv")
+graph = AgentsGraph(llm,"md")
+app = graph.build_workflow()
 
 
-
-#Graph
-workflow = StateGraph(AgentState)
-
-workflow.add_node("supervisor",partial(supervisor_agent_node,language_model=llm))
-workflow.add_node("direct_response",partial(direct_response_node,language_model=llm))
-workflow.add_node("data_agent",partial(data_agent_node,language_model=llm))
-workflow.add_node("report_writer",partial(report_writer_agent_node,language_model=llm,report_format="md"))
-
-
-#Agents reasoning workflow
-workflow.set_entry_point("supervisor")
-workflow.add_conditional_edges(
-"supervisor",
-route_decision,
-    {
-        "data_agent":"data_agent",
-        "direct_response":"direct_response"
-    }
-)
-workflow.add_edge("data_agent","report_writer")
-workflow.add_edge("report_writer",END)
-workflow.add_edge("direct_response",END)
-
-
-app = workflow.compile()
-
-
-if __name__ == "__main__":
-    while True:
-        print("prompt>> ",end="")
-        q = input()
-        initial_state = AgentState(
-            question = q,
-            decision = "",
-            analysis = "",
-            report = "",
-            dataframe = df
-        )
-        app.invoke(initial_state)
-        print()
-
-
-
-
-
-
-
-
-
-
-
-"""
-#Start agent
 while True:
-    print("Prompt>> ",end="")
+    print("prompt>> ",end="")
     q = input()
-    
-    print("Answer: ",answers["output"])
-    print("\n")
-"""
+    initial_state = AgentState(
+        question = q,
+        decision = "",
+        analysis = "",
+        report = "",
+        dataframe = df
+    )
+    graph.run_work_flow(app,initial_state)
+    print()
