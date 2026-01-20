@@ -21,7 +21,7 @@ api_v = "2025-01-01-preview"
 
 llm = load_llm(credentials,end_p,model_id,temperature,api_v)
 df = extract_data("data/btcusd_1-min_data.csv")
-graph = AgentsGraph(llm,"md")
+graph = AgentsGraph(llm,"pdf")
 app = graph.build_workflow()
 
 
@@ -36,4 +36,4 @@ while True:
         dataframe = df
     )
     graph.run_work_flow(app,initial_state)
-    print()
+    print("\n")
