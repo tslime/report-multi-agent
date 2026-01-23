@@ -37,17 +37,3 @@ while True:
     )
     graph.run_work_flow(app,initial_state)
     print("\n")
-
-
-while True:
-    print("prompt>> ",end="")
-    q = input()
-    initial_state = AgentState(
-        question = q,
-        decision = "",
-        analysis = "",
-        report = "",
-        dataframe = df
-    )
-    graph.run_work_flow(app,initial_state)
-    print("\n")
